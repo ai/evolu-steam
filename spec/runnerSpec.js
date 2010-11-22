@@ -36,13 +36,42 @@ describe('evoplus.steam.Runner', function() {
         var run = new evoplus.steam.Runner('/__spec__/log.js')
         
         var received = []
-        run._onMessage = function(name, mes) { received.push([name, mes]) }
+        run._onmessage = function(from, msg) { received.push([from, msg]) }
         
         run.workers[1].postMessage({ command: 'showLog' })
         waitsFor(function() { return received.length > 0 })
         runs(function() {
             var init = { command: 'init', name: 1, options: { count: 2 } }
             expect(received).toEqual([ [1, [init]] ])
+        })
+    })
+    
+    it('should dispatch method on message', function() {
+        var run = new evoplus.steam.Runner('/__spec__/log.js')
+        
+        run._ontest = function() { }
+        spyOn(run, '_ontest')
+        
+        run._onmessage(0, { command: 'test' })
+        expect(run._ontest).toHaveBeenCalledWith(0, { command: 'test' })
+    })
+    
+    it('should load another worker by _worker_ command', function() {
+        var run = new evoplus.steam.Runner('/__spec__/log.js')
+        run._onworker(0, { command: 'worker', name: 'test' })
+        
+        expect(run.workers.length).toEqual(3)
+        
+        var log = null
+        run._onmessage = function(name, msg) { log = msg }
+        
+        run.workers[2].postMessage({ command: 'showLog' })
+        waitsFor(function() { return log != null })
+        runs(function() {
+            expect(log).toEqual([{
+                command: 'init', name: 'test', options: { count: 2 },
+                from: 0, params: { command: 'worker', name: 'test' }
+            }])
         })
     })
 })
