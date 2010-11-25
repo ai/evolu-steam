@@ -47,7 +47,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should dispatch method on message', function() {
-        var run = new evoplus.steam.Runner('/__spec__/log.js')
+        var run = new evoplus.steam.Runner('/__spec__/log.js', { count: 0 })
         
         run._ontest = function() { }
         spyOn(run, '_ontest')
@@ -95,5 +95,14 @@ describe('evoplus.steam.Runner', function() {
                 command: 'worker', from: 0, data: 'test'
             }])
         })
+    })
+    
+    it('should have debug log command', function() {
+        var run = new evoplus.steam.Runner('/__spec__/log.js', { count: 0 })
+        
+        spyOn(console, 'log')
+        run._onlog(0, { data: { a: 1 } })
+        
+        expect(console.log).toHaveBeenCalledWith('Worker 0:', { a: 1 })
     })
 })
