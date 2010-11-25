@@ -58,7 +58,7 @@ describe('evoplus.steam.Runner', function() {
     
     it('should load another worker by _worker_ command', function() {
         var run = new evoplus.steam.Runner('/__spec__/log.js')
-        run._onworker(0, { command: 'worker', name: 'test' })
+        run._onload(0, { command: 'load', name: 'test' })
         
         expect(run.workers.length).toEqual(3)
         
@@ -70,7 +70,7 @@ describe('evoplus.steam.Runner', function() {
         runs(function() {
             expect(log).toEqual([{
                 command: 'init', name: 'test', options: { count: 2 },
-                from: 0, params: { command: 'worker', name: 'test' }
+                from: 0, params: { command: 'load', name: 'test' }
             }])
         })
     })
