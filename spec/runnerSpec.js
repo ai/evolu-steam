@@ -131,6 +131,30 @@ describe('evoplus.steam.Runner', function() {
         ])
     })
     
+    it('should allow to set options to worker', function() {
+        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run.workers[0].postMessage('clearLog')
+        
+        run.option('a', { a: 1 })
+        run.option('fitness', function (a) { return a + 1 })
+        
+        var log = null
+        run._onmessage = function(name, msg) { console.log(arguments); log = msg }
+        
+        run.workers[0].postMessage('showLog')
+        waitsFor(function() { return log != null })
+        runs(function() {
+            expect(log).toEqual([
+                { command: 'option', name: 'a', value: { a: 1 } },
+                {
+                    command: 'option',
+                    name:    'fitness',
+                    value:   'function (a) { return a + 1 }'
+                }
+            ])
+        })
+    })
+    
     it('should terminate workers', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js', { count: 0 })
         run.workers[0] = { terminate: function() {} }
