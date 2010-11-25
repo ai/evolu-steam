@@ -38,11 +38,11 @@ describe('evoplus.steam.Runner', function() {
         var received = []
         run._onmessage = function(from, msg) { received.push([from, msg]) }
         
-        run.workers[1].postMessage({ command: 'showLog' })
+        run.workers[0].postMessage({ command: 'showLog' })
         waitsFor(function() { return received.length > 0 })
         runs(function() {
-            var init = { command: 'init', name: 1, options: { count: 2 } }
-            expect(received).toEqual([ [1, [init]] ])
+            var init = { command: 'init', name: 0, options: { count: 2 } }
+            expect(received).toEqual([ [0, [init]] ])
         })
     })
     
@@ -60,17 +60,39 @@ describe('evoplus.steam.Runner', function() {
         var run = new evoplus.steam.Runner('/__spec__/log.js')
         run._onload(0, { command: 'load', name: 'test' })
         
-        expect(run.workers.length).toEqual(3)
+        expect(run.workers.test).not.toBeNull(3)
         
         var log = null
         run._onmessage = function(name, msg) { log = msg }
         
-        run.workers[2].postMessage({ command: 'showLog' })
+        run.workers.test.postMessage({ command: 'showLog' })
         waitsFor(function() { return log != null })
         runs(function() {
             expect(log).toEqual([{
                 command: 'init', name: 'test', options: { count: 2 },
                 from: 0, params: { command: 'load', name: 'test' }
+            }])
+        })
+    })
+    
+    it('should send messages between workers', function() {
+        var run = new evoplus.steam.Runner('/__spec__/log.js')
+        
+        run.workers[0].postMessage({ command: 'clearLog' })
+        run.workers[1].postMessage({ command: 'clearLog' })
+        
+        run._onworker(0, { to: 1, data: 'test' })
+        
+        var log = {}
+        run._onmessage = function(name, msg) { log[name] = msg }
+        
+        run.workers[0].postMessage({ command: 'showLog' })
+        run.workers[1].postMessage({ command: 'showLog' })
+        waitsFor(function() { return log[0] && log[1] })
+        runs(function() {
+            expect(log[0]).toEqual([])
+            expect(log[1]).toEqual([{
+                command: 'worker', from: 0, data: 'test'
             }])
         })
     })
