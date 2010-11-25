@@ -58,7 +58,7 @@ describe('evoplus.steam.Runner', function() {
     
     it('should load another worker by _worker_ command', function() {
         var run = new evoplus.steam.Runner('/__spec__/log.js')
-        run._onload(0, { command: 'load', name: 'test' })
+        run._onload(0, { command: 'load', name: 'test', params: { a: 1 } })
         
         expect(run.workers.test).not.toBeNull(3)
         
@@ -69,8 +69,8 @@ describe('evoplus.steam.Runner', function() {
         waitsFor(function() { return log != null })
         runs(function() {
             expect(log).toEqual([{
-                command: 'init', name: 'test', options: { count: 2 },
-                from: 0, params: { command: 'load', name: 'test' }
+                command: 'init', 
+                name: 'test', options: { count: 2 }, from: 0, params: { a: 1 }
             }])
         })
     })
@@ -104,5 +104,24 @@ describe('evoplus.steam.Runner', function() {
         run._onlog(0, { data: { a: 1 } })
         
         expect(console.log).toHaveBeenCalledWith('Worker 0:', { a: 1 })
+    })
+    
+    it('should send out commands to listeners', function() {
+        var run = new evoplus.steam.Runner('/__spec__/log.js', { count: 0 })
+        
+        var log = []
+        run.bind('a', function() { log.push(['a', arguments, this]) })
+        run.bind(function() { log.push(['all', arguments, this]) })
+        
+        var a = { command: 'out', event: 'a', data: { a: 1 } }
+        run._onout(0, a)
+        var b = { command: 'out', event: 'b', data: { b: 2 } }
+        run._onout(1, b)
+        
+        expect(log).toEqual([
+            ['a',   [{ a: 1 }, 0, a], run],
+            ['all', [{ a: 1 }, 0, a], run],
+            ['all', [{ b: 2 }, 1, b], run]
+        ])
     })
 })
