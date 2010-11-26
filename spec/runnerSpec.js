@@ -168,4 +168,21 @@ describe('evoplus.steam.Runner', function() {
         expect(run.workers[0].terminate).toHaveBeenCalled()
         expect(run.workers[1].terminate).toHaveBeenCalled()
     })
+    
+    it('should start and stop computation', function() {
+        run = new evoplus.steam.Runner('/__spec__/log.js', { count: 1 })
+        run.workers[0].postMessage('clearLog')
+        
+        run.start()
+        run.stop()
+        
+        var log = null
+        run._onmessage = function(name, msg) { console.log(arguments); log = msg }
+        
+        run.workers[0].postMessage('showLog')
+        waitsFor(function() { return log != null })
+        runs(function() {
+            expect(log).toEqual([{ command: 'start' }, { command: 'stop' }])
+        })
+    })
 })
