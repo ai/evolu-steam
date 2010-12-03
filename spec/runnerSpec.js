@@ -1,8 +1,6 @@
 describe('evoplus.steam.Runner', function() {
     var run
-    afterEach(function () {
-        run.terminate()
-    })
+    afterEach(function () { run.terminate() })
     
     it('should create and init workers', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js')
