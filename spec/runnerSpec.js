@@ -24,10 +24,10 @@ describe('evoplus.steam.Runner', function() {
         
         runs(function() {
             expect(first).toEqual([
-                { command: 'init', name: '0', count: 2 }
+                { command: 'init', name: 0, count: 2 }
             ])
             expect(second).toEqual([
-                { command: 'init', name: '1', count: 2 }
+                { command: 'init', name: 1, count: 2 }
             ])
         })
     })
@@ -47,8 +47,8 @@ describe('evoplus.steam.Runner', function() {
         run.workers[0].postMessage('showLog')
         waitsFor(function() { return received.length > 0 })
         runs(function() {
-            var init = { command: 'init', name: '0', count: 2 }
-            expect(received).toEqual([ ['0', [init]] ])
+            var init = { command: 'init', name: 0, count: 2 }
+            expect(received).toEqual([ [0, [init]] ])
         })
     })
     
