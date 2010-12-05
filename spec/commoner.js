@@ -1,4 +1,4 @@
-importScripts('/drivers/common.js')
+importScripts('../drivers/common.js')
 
 on('talk', function(msg) {
     log(msg.data)
