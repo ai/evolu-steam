@@ -115,7 +115,9 @@ describe('evoplus.steam.Runner', function() {
         
         var log = []
         run.bind('a', function() { log.push(['a', arguments, this]) })
-        run.bind(function() { log.push(['all', arguments, this]) })
+        var result = run.bind(function() { log.push(['all', arguments, this]) })
+        
+        expect(result).toEqual(run)
         
         var a = { command: 'out', event: 'a', data: { a: 1 } }
         run._onout(0, a)
@@ -133,8 +135,10 @@ describe('evoplus.steam.Runner', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js')
         run.workers[0].postMessage('clearLog')
         
-        run.option('a', { a: 1 })
+        var result = run.option('a', { a: 1 })
         run.option('fitness', function (a) { return a + 1 })
+        
+        expect(result).toEqual(run)
         
         var log = null
         run._onmessage = function(name, msg) { log = msg }
@@ -147,7 +151,7 @@ describe('evoplus.steam.Runner', function() {
                 {
                     command: 'option',
                     name:    'fitness',
-                    value:   'function (a) { return a + 1 }'
+                    func:    'function (a) { return a + 1 }'
                 }
             ])
         })
@@ -161,7 +165,9 @@ describe('evoplus.steam.Runner', function() {
         spyOn(run.workers[0], 'terminate')
         spyOn(run.workers[1], 'terminate')
         
-        run.terminate()
+        var result = run.terminate()
+        
+        expect(result).toEqual(run)
         
         expect(run.workers[0].terminate).toHaveBeenCalled()
         expect(run.workers[1].terminate).toHaveBeenCalled()
@@ -171,8 +177,11 @@ describe('evoplus.steam.Runner', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js', 1)
         run.workers[0].postMessage('clearLog')
         
-        run.start()
-        run.stop()
+        var result = run.start()
+        expect(result).toEqual(run)
+        
+        result = run.stop()
+        expect(result).toEqual(run)
         
         var log = null
         run._onmessage = function(name, msg) { log = msg }
