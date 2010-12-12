@@ -5,4 +5,6 @@ on('talk', function(msg) {
     load('A', { a: 1 })
     worker('A', { b: 2 })
     out({ c: 3 })
+    log(options.a)
+    log(options.sum(1, 2))
 })

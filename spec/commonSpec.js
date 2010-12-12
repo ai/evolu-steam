@@ -7,15 +7,20 @@ describe('drivers/common.js', function() {
         log = []
         run.workers[0].onmessage = function(e) { log.push(e.data) }
         
+        run.option('a', 1).option('a', 2).
+            option('sum', function(a, b) { return a + b })
+        
         run.workers[0].postMessage({ command: 'talk', data: 'test' })
         
-        waitsFor(function() { return log.length == 4 })
+        waitsFor(function() { return log.length >= 4 })
         runs(function() {
             expect(log).toEqual([
                 { command: 'log',    data: 'test' },
                 { command: 'load',   name: 'A', params: { a: 1 } },
                 { command: 'worker', data: { b: 2 }, to: 'A' },
-                { command: 'out',    data: { c: 3 } }
+                { command: 'out',    data: { c: 3 } },
+                { command: 'log',    data: 2 },
+                { command: 'log',    data: 3 }
             ])
         })
     })
