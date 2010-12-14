@@ -36,6 +36,17 @@ describe('evoplus.steam.Runner', function() {
         expect(run.count).toEqual(3)
     })
     
+    it('should send commands to workers', function() {
+        run = new evoplus.steam.Runner('/__spec__/log.js', 2)
+        spyOn(run.workers[0], 'postMessage')
+        spyOn(run.workers[1], 'postMessage')
+        
+        run.send({ a: 1 })
+        
+        expect(run.workers[0].postMessage).toHaveBeenCalledWith({ a: 1 })
+        expect(run.workers[1].postMessage).toHaveBeenCalledWith({ a: 1 })
+    })
+    
     it('should receive messages from workers', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js')
         
