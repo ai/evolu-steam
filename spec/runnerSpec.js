@@ -41,7 +41,9 @@ describe('evoplus.steam.Runner', function() {
         spyOn(run.workers[0], 'postMessage')
         spyOn(run.workers[1], 'postMessage')
         
-        run.send({ a: 1 })
+        var result = run.send({ a: 1 })
+        
+        expect(result).toEqual(run)
         
         expect(run.workers[0].postMessage).toHaveBeenCalledWith({ a: 1 })
         expect(run.workers[1].postMessage).toHaveBeenCalledWith({ a: 1 })
@@ -75,7 +77,9 @@ describe('evoplus.steam.Runner', function() {
         run = new evoplus.steam.Runner('/__spec__/log.js')
         run._onload('0', { command: 'load', name: 'test', params: { a: 1 } })
         
-        expect(run.workers.test).not.toBeNull(3)
+        expect(run.workers.test).not.toBeNull()
+        expect(run.count).toEqual(2)
+        expect(run.all).toEqual(3)
         
         var log = null
         run._onmessage = function(name, msg) { log = msg }
@@ -88,6 +92,31 @@ describe('evoplus.steam.Runner', function() {
                 from: '0', params: { a: 1 }
             }])
         })
+    })
+    
+    it('should allow set listener for workers loading', function() {
+        run = new evoplus.steam.Runner('/__spec__/log.js')
+        
+        var callback = jasmine.createSpy()
+        var result = run.ready(callback)
+        expect(result).toEqual(run)
+        
+        run._onload(0, { command: 'load', name: 'test' })
+        
+        expect(run._initialized).toEqual(0)
+        
+        run._oninitialized()
+        run._oninitialized()
+        expect(run._initialized).toEqual(2)
+        expect(callback).not.toHaveBeenCalled()
+        
+        run._oninitialized()
+        expect(run._initialized).toEqual(3)
+        expect(callback).toHaveBeenCalled()
+        
+        var callback2 = jasmine.createSpy()
+        run.ready(callback2)
+        expect(callback2).toHaveBeenCalled()
     })
     
     it('should send messages between workers', function() {
@@ -202,5 +231,25 @@ describe('evoplus.steam.Runner', function() {
         runs(function() {
             expect(log).toEqual([{ command: 'start' }, { command: 'stop' }])
         })
+    })
+    
+    it('should request data from workers', function() {
+        run = new evoplus.steam.Runner('/__spec__/log.js', 2)
+        spyOn(run.workers[0], 'postMessage')
+        spyOn(run.workers[1], 'postMessage')
+        
+        run._onmessage(1, { command: 'getter', name: 'a' })
+        
+        var callback = jasmine.createSpy()
+        var result = run.get('a', callback)
+        expect(result).toEqual(run)
+        
+        expect(run.workers[0].postMessage).not.toHaveBeenCalled()
+        expect(run.workers[1].postMessage).toHaveBeenCalledWith({
+            command: 'get', name: 'a', id: 1 })
+        
+        var command = { command: 'result', data: 'A', id: 1 }
+        run._onmessage(1, command)
+        expect(callback).toHaveBeenCalledWith('A', command, 1)
     })
 })

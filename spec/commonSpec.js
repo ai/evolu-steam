@@ -15,6 +15,8 @@ describe('drivers/common.js', function() {
         waitsFor(function() { return log.length >= 4 })
         runs(function() {
             expect(log).toEqual([
+                { command: 'getter', name: 'answer' },
+                { command: 'initialized' },
                 { command: 'log',    data: 'test' },
                 { command: 'load',   name: 'A', params: { a: 1 } },
                 { command: 'worker', data: { b: 2 }, to: 'A' },
@@ -22,6 +24,17 @@ describe('drivers/common.js', function() {
                 { command: 'log',    data: 2 },
                 { command: 'log',    data: 3 }
             ])
+        })
+    })
+    
+    it('should return requested data', function() {
+        run = new evoplus.steam.Runner('/__spec__/commoner.js', 1)
+        run.ready(function() {
+            var result = []
+            run.get('answer', function(data) { result.push(data) })
+            
+            waitsFor(function() { return result.length != 0 })
+            runs(function() { expect(result).toEqual(42) })
         })
     })
 
