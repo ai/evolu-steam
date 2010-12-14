@@ -3,7 +3,7 @@ describe('drivers/common.js', function() {
     afterEach(function () { run.terminate() })
 
     it('should have functions for common drivers tasks', function() {
-        run = new evoplus.steam.Runner('/__spec__/commoner.js', 1)
+        run = new evoplus.steam.Runner('/__spec__/workers/commoner.js', 1)
         log = []
         run.workers[0].onmessage = function(e) { log.push(e.data) }
         
@@ -20,7 +20,7 @@ describe('drivers/common.js', function() {
                 { command: 'initialized' },
                 { command: 'log',    data: 'test' },
                 { command: 'load',   name: 'A', params: { a: 1 } },
-                { command: 'worker', to: 'A', content: { command: 'b', b: 2 } },
+                { command: 'worker', to: 'A', content: { command: ':b' } },
                 { command: 'out',    data: { c: 3 } },
                 { command: 'log',    data: 2 },
                 { command: 'log',    data: 3 }
@@ -29,7 +29,7 @@ describe('drivers/common.js', function() {
     })
     
     it('should return requested data', function() {
-        run = new evoplus.steam.Runner('/__spec__/commoner.js', 1)
+        run = new evoplus.steam.Runner('/__spec__/workers/commoner.js', 1)
         run.ready(function() {
             var result = []
             run.get('answer', function(data) { result.push(data) })

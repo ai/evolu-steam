@@ -3,9 +3,9 @@ describe('evoplus.steam.Runner', function() {
     afterEach(function () { run.terminate() })
     
     it('should create and init workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         
-        expect(run.driver).toEqual('/__spec__/log.js')
+        expect(run.driver).toEqual('/__spec__/workers/log.js')
         expect(run.count).toEqual(2)
         expect(run.workers[0]).not.toBeNull()
         expect(run.workers[1]).not.toBeNull()
@@ -31,13 +31,13 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should load options.count workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 3)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 3)
         expect(run.workers[2]).not.toBeNull()
         expect(run.count).toEqual(3)
     })
     
     it('should send commands to workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 2)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 2)
         spyOn(run.workers[0], 'postMessage')
         spyOn(run.workers[1], 'postMessage')
         
@@ -50,7 +50,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should receive messages from workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         
         var received = []
         run._onmessage = function(from, msg) { received.push([from, msg]) }
@@ -64,7 +64,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should dispatch method on message', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 0)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 0)
         
         run._ontest = function() { }
         spyOn(run, '_ontest')
@@ -74,7 +74,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should load another worker by _worker_ command', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         run._onload('0', { command: 'load', name: 'test', params: { a: 1 } })
         
         expect(run.workers.test).not.toBeNull()
@@ -95,7 +95,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should allow set listener for workers loading', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         
         var callback = jasmine.createSpy()
         var result = run.ready(callback)
@@ -120,13 +120,13 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should send messages between workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         
         run.workers[0].postMessage('clearLog')
         run.workers[1].postMessage('clearLog')
         
         run._onworker(0, { command: 'worker', to: 1,
-                           content: { command: 'test', a: 1 } })
+                           content: { command: ':test', a: 1 } })
         
         var log = {}
         run._onmessage = function(name, msg) { log[name] = msg }
@@ -136,12 +136,12 @@ describe('evoplus.steam.Runner', function() {
         waitsFor(function() { return log[0] && log[1] })
         runs(function() {
             expect(log[0]).toEqual([])
-            expect(log[1]).toEqual([{ command: 'test', from: 0, a: 1 }])
+            expect(log[1]).toEqual([{ command: ':test', from: 0, a: 1 }])
         })
     })
     
     it('should have debug log command', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 0)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 0)
         
         spyOn(console, 'log')
         run._onlog(0, { data: { a: 1 } })
@@ -150,7 +150,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should send out commands to listeners', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 0)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 0)
         
         var log = []
         run.bind('a', function() { log.push(['a', arguments, this]) })
@@ -171,7 +171,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should allow to set options to worker', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
         run.workers[0].postMessage('clearLog')
         
         var result = run.option('a', { a: 1 })
@@ -197,7 +197,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should terminate workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 0)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 0)
         run.workers[0] = { terminate: function() {} }
         run.workers[1] = { terminate: function() {} }
         
@@ -213,7 +213,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should start and stop computation', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 1)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 1)
         run.workers[0].postMessage('clearLog')
         
         var result = run.start()
@@ -233,7 +233,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should request data from workers', function() {
-        run = new evoplus.steam.Runner('/__spec__/log.js', 2)
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 2)
         spyOn(run.workers[0], 'postMessage')
         spyOn(run.workers[1], 'postMessage')
         
