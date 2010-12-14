@@ -125,7 +125,8 @@ describe('evoplus.steam.Runner', function() {
         run.workers[0].postMessage('clearLog')
         run.workers[1].postMessage('clearLog')
         
-        run._onworker(0, { to: 1, data: 'test' })
+        run._onworker(0, { command: 'worker', to: 1,
+                           content: { command: 'test', a: 1 } })
         
         var log = {}
         run._onmessage = function(name, msg) { log[name] = msg }
@@ -135,9 +136,7 @@ describe('evoplus.steam.Runner', function() {
         waitsFor(function() { return log[0] && log[1] })
         runs(function() {
             expect(log[0]).toEqual([])
-            expect(log[1]).toEqual([{
-                command: 'worker', from: 0, data: 'test'
-            }])
+            expect(log[1]).toEqual([{ command: 'test', from: 0, a: 1 }])
         })
     })
     

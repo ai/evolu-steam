@@ -12,14 +12,15 @@ describe('drivers/common.js', function() {
         
         run.workers[0].postMessage({ command: 'talk', data: 'test' })
         
-        waitsFor(function() { return log.length >= 4 })
+        waitsFor(function() { return log.length >= 9 })
         runs(function() {
             expect(log).toEqual([
+                { command: 'log',    data: 'I am 0 from 1' },
                 { command: 'getter', name: 'answer' },
                 { command: 'initialized' },
                 { command: 'log',    data: 'test' },
                 { command: 'load',   name: 'A', params: { a: 1 } },
-                { command: 'worker', data: { b: 2 }, to: 'A' },
+                { command: 'worker', to: 'A', content: { command: 'b', b: 2 } },
                 { command: 'out',    data: { c: 3 } },
                 { command: 'log',    data: 2 },
                 { command: 'log',    data: 3 }
