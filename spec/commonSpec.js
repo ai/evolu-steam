@@ -23,6 +23,7 @@ describe('drivers/common.js', function() {
                 { command: 'worker', to: 'A', content: { command: ':b' } },
                 { command: 'out',    data: { c: 3 } },
                 { command: 'log',    data: 2 },
+                { command: 'log',    data: 'default' },
                 { command: 'log',    data: 3 }
             ])
         })
