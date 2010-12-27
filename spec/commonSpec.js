@@ -31,13 +31,15 @@ describe('drivers/common.js', function() {
     
     it('should return requested data', function() {
         run = new evoplus.steam.Runner('/__spec__/workers/commoner.js', 1)
-        run.ready(function() {
-            var result = []
+        
+        var result = []
+        waitsFor(function() { return run.isInitialized() })
+        runs(function() {
             run.get('answer', function(data) { result.push(data) })
-            
-            waitsFor(function() { return result.length != 0 })
-            runs(function() { expect(result).toEqual(42) })
         })
+        
+        waitsFor(function() { return result.length != 0 })
+        runs(function() { expect(result).toEqual([42]) })
     })
 
 })

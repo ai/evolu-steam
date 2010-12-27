@@ -104,14 +104,17 @@ describe('evoplus.steam.Runner', function() {
         run._onload(0, { command: 'load', name: 'test' })
         
         expect(run._initialized).toEqual(0)
+        expect(run.isInitialized()).toBeFalsy()
         
         run._oninitialized()
         run._oninitialized()
         expect(run._initialized).toEqual(2)
+        expect(run.isInitialized()).toBeFalsy()
         expect(callback).not.toHaveBeenCalled()
         
         run._oninitialized()
         expect(run._initialized).toEqual(3)
+        expect(run.isInitialized()).toBeTruthy()
         expect(callback).toHaveBeenCalled()
         
         var callback2 = jasmine.createSpy()
