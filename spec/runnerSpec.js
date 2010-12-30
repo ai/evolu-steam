@@ -261,6 +261,12 @@ describe('evoplus.steam.Runner', function() {
         expect(result).toEqual(run)
         
         expect(run.workers[0].postMessage).not.toHaveBeenCalled()
+        expect(run.workers[1].postMessage).not.toHaveBeenCalled()
+        
+        run._oninitialized()
+        run._oninitialized()
+        
+        expect(run.workers[0].postMessage).not.toHaveBeenCalled()
         expect(run.workers[1].postMessage).toHaveBeenCalledWith({
             command: 'get', name: 'a', id: 1 })
         
