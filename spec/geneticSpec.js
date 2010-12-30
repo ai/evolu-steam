@@ -62,70 +62,70 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return false !== generation }, 500)
         runs(function() { expect(generation).toEqual(0) })
         
-//        waitsFor(function() { return run.isInitialized() })
-//        runs(function() {
-//            run._onworker = function(_, msg) { log.push([msg.to, msg.content]) }
-//            run.workers[0].postMessage = function() {}
-//            run.workers[1].postMessage = function() {}
-//            run.start()
-//        })
-//        
-//        waitsFor(function() { return 2 <= log.length })
-//        runs(function() {
-//            expect(log).toEqual([
-//                [0, { command: ':process', genes: [['a', 1], ['b', 2]] }],
-//                [1, { command: ':process', genes: [['c', 3], ['d', 4]] }]
-//            ])
-//            log = []
-//            
-//            run.workers.reduce.postMessage({
-//                command: ':processed', from: 0,
-//                genes: [['AA', 10], ['AB', 5], ['BA', 5], ['BB', 20]]
-//            })
-//        })
+        waitsFor(function() { return run.isInitialized() })
+        runs(function() {
+            run._onworker = function(_, msg) { log.push([msg.to, msg.content]) }
+            run.workers[0].postMessage = function() {}
+            run.workers[1].postMessage = function() {}
+            run.start()
+        })
+        
+        waitsFor(function() { return 2 <= log.length })
+        runs(function() {
+            expect(log).toEqual([
+                [0, { command: ':process', genes: [['a', 1], ['b', 2]] }],
+                [1, { command: ':process', genes: [['c', 3], ['d', 4]] }]
+            ])
+            log = []
+            
+            run.workers.reduce.postMessage({
+                command: ':processed', from: 0,
+                genes: [['AA', 10], ['AB', 5], ['BA', 5], ['BB', 20]]
+            })
+        })
          
-//        waitsFor(function() { return 1 <= log.length })
-//        runs(function() {
-//            expect(log).toEqual([
-//                [0, { command: ':process', genes: [['e', 5], ['f', 6]] }]
-//            ])
-//            log = []
-//            
-//            run.workers.reduce.postMessage({
-//                command: ':processed', from: 1,
-//                genes: [['CC', 30], ['CD', 5], ['DC', 5], ['DD', 40]]
-//            })
-//            
-//            run.stop()
-//            
-//            run.workers.reduce.postMessage({
-//                command: ':processed', from: 0,
-//                genes: [['EE', 50], ['EF', 5], ['FE', 5], ['FF', 60]]
-//            })
-//                
-//            run.get('generation', function(value) { generation = value })
-//            run.get('population', function(value) { population = value })
-//            run.get('best',       function(value) { best = value })
-//        })
-//        
-//        waitsFor(function() { return false !== generation && false !== best &&
-//                                     false !== population })
-//        runs(function() {
-//            expect(generation).toEqual(1)
-//            expect(population).toEqual([['FF', 60], ['EE', 50], ['DD', 40],
-//                                        ['CC', 30], ['BB', 20], ['AA', 10]])
-//            expect(best).toEqual('FF')
-//            
-//            run.resume()
-//        })
-//        
-//        waitsFor(function() { return 2 <= log.length })
-//        runs(function() {
-//            expect(log).toEqual([
-//                [0, { command: ':process', genes: [['FF', 60], ['EE', 50]] }],
-//                [1, { command: ':process', genes: [['DD', 40], ['CC', 30]] }]
-//            ])
-//        })
+        waitsFor(function() { return 1 <= log.length })
+        runs(function() {
+            expect(log).toEqual([
+                [0, { command: ':process', genes: [['e', 5], ['f', 6]] }]
+            ])
+            log = []
+            
+            run.workers.reduce.postMessage({
+                command: ':processed', from: 1,
+                genes: [['CC', 30], ['CD', 5], ['DC', 5], ['DD', 40]]
+            })
+            
+            run.stop()
+            
+            run.workers.reduce.postMessage({
+                command: ':processed', from: 0,
+                genes: [['EE', 50], ['EF', 5], ['FE', 5], ['FF', 60]]
+            })
+                
+            run.get('generation', function(value) { generation = value })
+            run.get('population', function(value) { population = value })
+            run.get('best',       function(value) { best = value })
+        })
+        
+        waitsFor(function() { return false !== generation && false !== best &&
+                                     false !== population })
+        runs(function() {
+            expect(generation).toEqual(1)
+            expect(population).toEqual([['FF', 60], ['EE', 50], ['DD', 40],
+                                        ['CC', 30], ['BB', 20], ['AA', 10]])
+            expect(best).toEqual('FF')
+            
+            run.resume()
+        })
+        
+        waitsFor(function() { return 2 <= log.length })
+        runs(function() {
+            expect(log).toEqual([
+                [0, { command: ':process', genes: [['FF', 60], ['EE', 50]] }],
+                [1, { command: ':process', genes: [['DD', 40], ['CC', 30]] }]
+            ])
+        })
     })
     
     it('should end processing, when get answer', function() {
@@ -143,10 +143,29 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return run.isInitialized() })
         runs(function() { run.start() })
         
-        waitsFor(function() { return false !== answer }, 1000)
+        waitsFor(function() { return false !== answer })
         runs(function() {
             expect(answer).toEqual({ best: 'aaaa', generation: 3 })
         })
+    })
+    
+    it('should use custom fitness compare function', function() {
+        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run.option('population', [['aaaa', 4], ['aaaa', 4]])
+        run.option('fitness', function(a) { return a.length })
+        run.option('mutate',  function(a) {
+            return (Math.random() > 0.5) ? a.substr(1) : a + 'b'
+        })
+        run.option('isEnd',   function(best) { return '' == best })
+        run.option('compare', function(a, b) { return a - b })
+        
+        var end = false
+        run.bind('end', function(data) { end = true })
+        
+        waitsFor(function() { return run.isInitialized() })
+        runs(function() { run.start() })
+        
+        waitsFor(function() { return end })
     })
     
 })
