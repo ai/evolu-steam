@@ -11,7 +11,7 @@ on('talk', function(msg) {
     log(msg.data)
     load('A', { a: 1 })
     worker('A', { command: ':b' })
-    out({ c: 3 })
+    out('OutEvent', { c: 3 })
     log(options.a)
     log(options.b)
     log(options.sum(1, 2))

@@ -23,7 +23,7 @@ describe('drivers/common.js', function() {
                 { command: 'log',    data: 'test' },
                 { command: 'load',   name: 'A', params: { a: 1 } },
                 { command: 'worker', to: 'A', content: { command: ':b' } },
-                { command: 'out',    data: { c: 3 } },
+                { command: 'out',    event: 'OutEvent', data: { c: 3 } },
                 { command: 'log',    data: 2 },
                 { command: 'log',    data: 'default' },
                 { command: 'log',    data: 3 }
