@@ -130,7 +130,6 @@ describe('drivers/genetic.js', function() {
         run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
         run.option('population', [['a', 1], ['', 0]])
         run.option('mutate',  function(a)    { return a + 'a' })
-        run.option('mix',     function(a, b) { return [a, b] })
         run.option('fitness', function(a)    { return a.length })
         run.option('isEnd',   function(best, fitness) {
             return 'aaaa' == best && 4 == fitness
