@@ -1,9 +1,11 @@
 describe('drivers/common.js', function() {
     var run
     afterEach(function () { run.terminate() })
+    
+    var commonerDriver = '/__spec__/workers/commoner.js?' + (new Date).valueOf()
 
     it('should have functions for common drivers tasks', function() {
-        run = new evoplus.steam.Runner('/__spec__/workers/commoner.js', 1)
+        run = new evoplus.steam.Runner(commonerDriver, 1)
         log = []
         run.workers[0].onmessage = function(e) { log.push(e.data) }
         
@@ -32,7 +34,7 @@ describe('drivers/common.js', function() {
     })
     
     it('should return requested data', function() {
-        run = new evoplus.steam.Runner('/__spec__/workers/commoner.js', 1)
+        run = new evoplus.steam.Runner(commonerDriver, 1)
         run._onlog = function() { }
         
         var result = []
