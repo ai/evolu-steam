@@ -174,7 +174,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should allow to set options to worker', function() {
-        run = new evoplus.steam.Runner('/__spec__/workers/log.js')
+        run = new evoplus.steam.Runner('/__spec__/workers/log.js', 1)
         run.workers[0].postMessage('clearLog')
         
         var result = run.option('a', { a: 1 })
@@ -186,6 +186,15 @@ describe('evoplus.steam.Runner', function() {
         run._onmessage = function(name, msg) { log = msg }
         
         run.workers[0].postMessage('showLog')
+        waitsFor(function() { return log != null })
+        runs(function() {
+            expect(log).toEqual([])
+            run._oninitialized()
+            
+            log = null
+            run.workers[0].postMessage('showLog')
+        })
+        
         waitsFor(function() { return log != null })
         runs(function() {
             expect(log).toEqual([
@@ -215,7 +224,7 @@ describe('evoplus.steam.Runner', function() {
         expect(run.workers[1].terminate).toHaveBeenCalled()
     })
     
-    it('should start and stop computation', function() {
+    it('should start, stop and resume computation', function() {
         run = new evoplus.steam.Runner('/__spec__/workers/log.js', 1)
         run.workers[0].postMessage('clearLog')
         
@@ -225,13 +234,18 @@ describe('evoplus.steam.Runner', function() {
         result = run.stop()
         expect(result).toEqual(run)
         
+        result = run.resume()
+        expect(result).toEqual(run)
+        
         var log = null
         run._onmessage = function(name, msg) { log = msg }
         
         run.workers[0].postMessage('showLog')
         waitsFor(function() { return log != null })
         runs(function() {
-            expect(log).toEqual([{ command: 'start' }, { command: 'stop' }])
+            expect(log).toEqual([
+                { command: 'start' }, { command: 'stop' }, { command: 'resume' }
+            ])
         })
     })
     

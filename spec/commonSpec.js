@@ -10,6 +10,8 @@ describe('drivers/common.js', function() {
         run.option('a', 1).option('a', 2).
             option('sum', function(a, b) { return a + b })
         
+        run._oninitialized()
+        
         run.workers[0].postMessage({ command: 'talk', data: 'test' })
         
         waitsFor(function() { return log.length >= 9 })
