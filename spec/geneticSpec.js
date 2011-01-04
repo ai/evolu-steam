@@ -176,7 +176,7 @@ describe('drivers/genetic.js', function() {
         run.option('compare', function(a, b) { return a - b })
         
         var end = false
-        run.bind('end', function(data) { end = true })
+        run.bind('end', function() { end = true })
         
         waitsFor(function() { return run.isInitialized() })
         runs(function() { run.start() })
@@ -194,7 +194,7 @@ describe('drivers/genetic.js', function() {
         })
         
         var end = false
-        run.bind('end', function(data) { end = true })
+        run.bind('end', function() { end = true })
         
         waitsFor(function() { return run.isInitialized() })
         runs(function() { run.start() })
@@ -208,6 +208,30 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return false !== population })
         runs(function() {
             expect(population).toEqual([['a00123', 2], ['a00123', 2]])
+        })
+    })
+    
+    it('should send step event', function() {
+        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run.option('population', [['a', 1], ['a', 1]])
+        run.option('mutate',  function(a, stagnation) { return a + stagnation })
+        run.option('fitness', function(a) { return 2 })
+        run.option('isEnd',   function(best, fitness, stagnation) {
+            return 4 == stagnation
+        })
+        
+        var end = false
+        run.bind('end', function() { end = true })
+        
+        var steps = {}
+        run.bind('step', function(e) { steps[e.generation] = e.stagnation })
+        
+        waitsFor(function() { return run.isInitialized() })
+        runs(function() { run.start() })
+        
+        waitsFor(function() { return end })
+        runs(function() {
+            expect(steps).toEqual({ 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 })
         })
     })
     
