@@ -180,7 +180,7 @@ describe('evoplus.steam.Runner', function() {
         run.workers[0].postMessage('clearLog')
         
         var result = run.option('a', { a: 1 })
-        run.option('fitness', function (a) { return a + 1 })
+        run.option('fitness', function (a) { return a + 1; })
         
         expect(result).toEqual(run)
         
@@ -204,7 +204,7 @@ describe('evoplus.steam.Runner', function() {
                 {
                     command: 'option',
                     name:    'fitness',
-                    func:    'function (a) { return a + 1 }'
+                    func:    'function (a) { return a + 1; }'
                 }
             ])
         })

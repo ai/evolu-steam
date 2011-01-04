@@ -6,7 +6,10 @@ describe('drivers/genetic.js', function() {
     
     it('should mutate and mix genes in separated map workers', function() {
         run = new evoplus.steam.Runner(driver, 1)
-        run.option('mutate',  function(a) { return a + 'M' })
+        run.option('mutate',  function(a, stagnation) {
+            for (var i = 0; i < stagnation; i++) { a += 'M' }
+            return a
+        })
         run.option('mix',     function(a, b) { return [b + '1', a + '2'] })
         run.option('fitness', function(a) {
             return ('A' == a.substr(0, 1)) ? 100 : 200
@@ -18,7 +21,10 @@ describe('drivers/genetic.js', function() {
             run.workers[0].onmessage = function(e) { log.push(e.data) }
             
             run.workers[0].postMessage({
-                command: ':process', genes: [['A', 0], ['B', 1]] })
+                command: ':process',
+                genes: [['A', 0], ['B', 1]],
+                stagnation: 2
+            })
         })
         
         waitsFor(function() { return log.length > 0 })
@@ -28,8 +34,8 @@ describe('drivers/genetic.js', function() {
                 to: 'reduce', 
                 content: {
                     command: ':processed',
-                    genes: [['BM1', 200], ['AM2', 100],
-                            ['BM1', 200], ['AM2', 100]]
+                    genes: [['BMM1', 200], ['AMM2', 100],
+                            ['BMM1', 200], ['AMM2', 100]]
                 }
              }])
         })
@@ -73,8 +79,12 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return 2 <= log.length })
         runs(function() {
             expect(log).toEqual([
-                [0, { command: ':process', genes: [['a', 1], ['b', 2]] }],
-                [1, { command: ':process', genes: [['c', 3], ['d', 4]] }]
+                [0, { command: ':process',
+                      genes: [['a', 1], ['b', 2]],
+                      stagnation: 0 }],
+                [1, { command: ':process',
+                      genes: [['c', 3], ['d', 4]],
+                      stagnation: 0 }]
             ])
             log = []
             
@@ -87,7 +97,9 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return 1 <= log.length })
         runs(function() {
             expect(log).toEqual([
-                [0, { command: ':process', genes: [['e', 5], ['f', 6]] }]
+                [0, { command: ':process',
+                      genes: [['e', 5], ['f', 6]],
+                      stagnation: 0 }]
             ])
             log = []
             
@@ -122,8 +134,12 @@ describe('drivers/genetic.js', function() {
         waitsFor(function() { return 2 <= log.length })
         runs(function() {
             expect(log).toEqual([
-                [0, { command: ':process', genes: [['FF', 60], ['EE', 50]] }],
-                [1, { command: ':process', genes: [['DD', 40], ['CC', 30]] }]
+                [0, { command: ':process',
+                      genes: [['FF', 60], ['EE', 50]],
+                      stagnation: 0 }],
+                [1, { command: ':process',
+                      genes: [['DD', 40], ['CC', 30]],
+                      stagnation: 0 }]
             ])
         })
     })
@@ -133,8 +149,8 @@ describe('drivers/genetic.js', function() {
         run.option('population', [['a', 1], ['', 0]])
         run.option('mutate',  function(a)    { return a + 'a' })
         run.option('fitness', function(a)    { return a.length })
-        run.option('isEnd',   function(best, fitness) {
-            return 'aaaa' == best && 4 == fitness
+        run.option('isEnd',   function(best, fitness, stagnation) {
+            return 'aaaa' == best && 4 == fitness && 0 == stagnation
         })
         
         var answer = false
@@ -166,6 +182,33 @@ describe('drivers/genetic.js', function() {
         runs(function() { run.start() })
         
         waitsFor(function() { return end })
+    })
+    
+    it('should calculate stagnation', function() {
+        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run.option('population', [['a', 1], ['a', 1]])
+        run.option('mutate',  function(a, stagnation) { return a + stagnation })
+        run.option('fitness', function(a) { return 2 })
+        run.option('isEnd',   function(best, fitness, stagnation) {
+            return 4 == stagnation
+        })
+        
+        var end = false
+        run.bind('end', function(data) { end = true })
+        
+        waitsFor(function() { return run.isInitialized() })
+        runs(function() { run.start() })
+        
+        var population = false
+        waitsFor(function() { return end })
+        runs(function() {
+            run.get('population', function(value) { population = value })
+        })
+        
+        waitsFor(function() { return false !== population })
+        runs(function() {
+            expect(population).toEqual([['a00123', 2], ['a00123', 2]])
+        })
     })
     
 })
