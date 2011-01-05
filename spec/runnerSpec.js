@@ -229,6 +229,7 @@ describe('evoplus.steam.Runner', function() {
     it('should start, stop and resume computation', function() {
         run = new evoplus.steam.Runner(logDriver, 1)
         run.workers[0].postMessage('clearLog')
+        run._oninitialized()
         
         var result = run.start()
         expect(result).toEqual(run)
@@ -275,5 +276,40 @@ describe('evoplus.steam.Runner', function() {
         var command = { command: 'result', data: 'A', id: 1 }
         run._onmessage(1, command)
         expect(callback).toHaveBeenCalledWith('A', command, 1)
+    })
+    
+    it('should call some methods only after initializing', function() {
+        run = new evoplus.steam.Runner(logDriver, 2)
+        run._onmessage(0, { command: 'getter', name: 'a' })
+        
+        run.start().stop().resume().option('a', 1).get('a', function() { })
+        
+        var log = []
+        run._onmessage = function(name, msg) { log.push(msg) }
+        
+        run._oninitialized()
+        run.workers[0].postMessage('showLog')
+        
+        waitsFor(function() { return log.length == 1 })
+        runs(function() {
+            expect(log[0]).toEqual([
+                { command : 'init', name : 0, count : 2 }
+            ])
+        
+            run._oninitialized()
+            run.workers[0].postMessage('showLog')
+        })
+        
+        waitsFor(function() { return log.length == 2 })
+        runs(function() {
+            expect(log[1]).toEqual([
+                { command : 'init', name : 0, count : 2 },
+                { command : 'start' },
+                { command : 'stop' },
+                { command : 'resume' },
+                { command : 'option', name : 'a', value : 1 },
+                { command : 'get', name : 'a', id : 1 }
+            ])
+        })
     })
 })

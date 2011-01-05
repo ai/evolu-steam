@@ -156,8 +156,7 @@ describe('drivers/genetic.js', function() {
         var answer = false
         run.bind('end', function(data) { answer = data })
         
-        waitsFor(function() { return run.isInitialized() })
-        runs(function() { run.start() })
+        run.start()
         
         waitsFor(function() { return false !== answer })
         runs(function() {
@@ -178,8 +177,7 @@ describe('drivers/genetic.js', function() {
         var end = false
         run.bind('end', function() { end = true })
         
-        waitsFor(function() { return run.isInitialized() })
-        runs(function() { run.start() })
+        run.start()
         
         waitsFor(function() { return end })
     })
@@ -196,8 +194,7 @@ describe('drivers/genetic.js', function() {
         var end = false
         run.bind('end', function() { end = true })
         
-        waitsFor(function() { return run.isInitialized() })
-        runs(function() { run.start() })
+        run.start()
         
         var population = false
         waitsFor(function() { return end })
@@ -226,8 +223,7 @@ describe('drivers/genetic.js', function() {
         var steps = {}
         run.bind('step', function(e) { steps[e.generation] = e.stagnation })
         
-        waitsFor(function() { return run.isInitialized() })
-        runs(function() { run.start() })
+        run.start()
         
         waitsFor(function() { return end })
         runs(function() {
