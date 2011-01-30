@@ -1,4 +1,4 @@
-# Evo+Steam – evolutionary computation for JavaScript
+# Evolu Steam – evolutionary computation for JavaScript
 
 ## Testing
 

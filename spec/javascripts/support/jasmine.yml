@@ -1,5 +1,5 @@
 src_files:
-  - evoplus-steam.js
+  - evolu-steam.js
 
 spec_files:
   - **/*[sS]pec.js

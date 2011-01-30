@@ -1,11 +1,11 @@
-describe('evoplus.steam.Runner', function() {
+describe('evolu.steam.Runner', function() {
     var run
     afterEach(function () { run.terminate() })
     
     var logDriver = '/__spec__/workers/log.js?' + (new Date).valueOf()
     
     it('should create and init workers', function() {
-        run = new evoplus.steam.Runner(logDriver)
+        run = new evolu.steam.Runner(logDriver)
         
         expect(run.driver).toEqual(logDriver)
         expect(run.count).toEqual(2)
@@ -33,13 +33,13 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should load options.count workers', function() {
-        run = new evoplus.steam.Runner(logDriver, 3)
+        run = new evolu.steam.Runner(logDriver, 3)
         expect(run.workers[2]).not.toBeNull()
         expect(run.count).toEqual(3)
     })
     
     it('should send commands to workers', function() {
-        run = new evoplus.steam.Runner(logDriver, 2)
+        run = new evolu.steam.Runner(logDriver, 2)
         spyOn(run.workers[0], 'postMessage')
         spyOn(run.workers[1], 'postMessage')
         
@@ -52,7 +52,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should receive messages from workers', function() {
-        run = new evoplus.steam.Runner(logDriver)
+        run = new evolu.steam.Runner(logDriver)
         
         var received = []
         run._onmessage = function(from, msg) { received.push([from, msg]) }
@@ -66,7 +66,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should dispatch method on message', function() {
-        run = new evoplus.steam.Runner(logDriver, 0)
+        run = new evolu.steam.Runner(logDriver, 0)
         
         run._ontest = function() { }
         spyOn(run, '_ontest')
@@ -76,7 +76,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should load another worker by _worker_ command', function() {
-        run = new evoplus.steam.Runner(logDriver)
+        run = new evolu.steam.Runner(logDriver)
         run._onload('0', { command: 'load', name: 'test', params: { a: 1 } })
         
         expect(run.workers.test).not.toBeNull()
@@ -97,7 +97,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should allow set listener for workers loading', function() {
-        run = new evoplus.steam.Runner(logDriver)
+        run = new evolu.steam.Runner(logDriver)
         
         var callback = jasmine.createSpy()
         var result = run.ready(callback)
@@ -125,7 +125,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should send messages between workers', function() {
-        run = new evoplus.steam.Runner(logDriver)
+        run = new evolu.steam.Runner(logDriver)
         
         run.workers[0].postMessage('clearLog')
         run.workers[1].postMessage('clearLog')
@@ -146,7 +146,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should have debug log command', function() {
-        run = new evoplus.steam.Runner(logDriver, 0)
+        run = new evolu.steam.Runner(logDriver, 0)
         
         spyOn(console, 'log')
         run._onlog(0, { data: { a: 1 } })
@@ -155,7 +155,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should send out commands to listeners', function() {
-        run = new evoplus.steam.Runner(logDriver, 0)
+        run = new evolu.steam.Runner(logDriver, 0)
         
         var log = []
         run.bind('a', function() { log.push(['a', arguments, this]) })
@@ -176,7 +176,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should allow to set options to worker', function() {
-        run = new evoplus.steam.Runner(logDriver, 1)
+        run = new evolu.steam.Runner(logDriver, 1)
         run.workers[0].postMessage('clearLog')
         
         var result = run.option('a', { a: 1 })
@@ -211,7 +211,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should terminate workers', function() {
-        run = new evoplus.steam.Runner(logDriver, 0)
+        run = new evolu.steam.Runner(logDriver, 0)
         run.workers[0] = { terminate: function() {} }
         run.workers[1] = { terminate: function() {} }
         
@@ -227,7 +227,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should start, stop and resume computation', function() {
-        run = new evoplus.steam.Runner(logDriver, 1)
+        run = new evolu.steam.Runner(logDriver, 1)
         run.workers[0].postMessage('clearLog')
         run._oninitialized()
         
@@ -253,7 +253,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should request data from workers', function() {
-        run = new evoplus.steam.Runner(logDriver, 2)
+        run = new evolu.steam.Runner(logDriver, 2)
         spyOn(run.workers[0], 'postMessage')
         spyOn(run.workers[1], 'postMessage')
         
@@ -279,7 +279,7 @@ describe('evoplus.steam.Runner', function() {
     })
     
     it('should call some methods only after initializing', function() {
-        run = new evoplus.steam.Runner(logDriver, 2)
+        run = new evolu.steam.Runner(logDriver, 2)
         run._onmessage(0, { command: 'getter', name: 'a' })
         
         run.start().stop().resume().option('a', 1).get('a', function() { })

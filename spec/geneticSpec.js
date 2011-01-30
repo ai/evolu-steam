@@ -5,7 +5,7 @@ describe('drivers/genetic.js', function() {
     var driver = '/drivers/genetic.js?' + (new Date).valueOf()
     
     it('should mutate and mix genes in separated map workers', function() {
-        run = new evoplus.steam.Runner(driver, 1)
+        run = new evolu.steam.Runner(driver, 1)
         run.option('mutate',  function(a, stagnation) {
             for (var i = 0; i < stagnation; i++) { a += 'M' }
             return a
@@ -42,7 +42,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should generate first population', function() {
-        run = new evoplus.steam.Runner(driver, 1)
+        run = new evolu.steam.Runner(driver, 1)
         run.option('generator', function(i) { return 10 * i })
         run.option('populationSize', 3)
         
@@ -56,7 +56,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should send work to map workers', function() {
-        run = new evoplus.steam.Runner(driver, 2)
+        run = new evolu.steam.Runner(driver, 2)
         run.option('isEnd', function(best) { return false })
         run.option('population', [['a', 1], ['b', 2], ['c', 3], ['d', 4],
                                   ['e', 5], ['f', 6]])
@@ -145,7 +145,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should end processing, when get answer', function() {
-        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run = new evolu.steam.Runner('/drivers/genetic.js', 1)
         run.option('population', [['a', 1], ['', 0]])
         run.option('mutate',  function(a)    { return a + 'a' })
         run.option('fitness', function(a)    { return a.length })
@@ -165,7 +165,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should use custom fitness compare function', function() {
-        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run = new evolu.steam.Runner('/drivers/genetic.js', 1)
         run.option('population', [['aaaa', 4], ['aaaa', 4]])
         run.option('fitness', function(a) { return a.length })
         run.option('mutate',  function(a) {
@@ -183,7 +183,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should calculate stagnation', function() {
-        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run = new evolu.steam.Runner('/drivers/genetic.js', 1)
         run.option('population', [['a', 1], ['a', 1]])
         run.option('mutate',  function(a, stagnation) { return a + stagnation })
         run.option('fitness', function(a) { return 2 })
@@ -209,7 +209,7 @@ describe('drivers/genetic.js', function() {
     })
     
     it('should send step event', function() {
-        run = new evoplus.steam.Runner('/drivers/genetic.js', 1)
+        run = new evolu.steam.Runner('/drivers/genetic.js', 1)
         run.option('population', [['a', 1], ['a', 1]])
         run.option('mutate',  function(a, stagnation) { return a + stagnation })
         run.option('fitness', function(a) { return 2 })
