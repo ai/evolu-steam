@@ -1,6 +1,6 @@
 describe('evolu.steam.Runner', function() {
     var run
-    afterEach(function () { run.terminate() })
+    afterEach(function() { run.terminate() })
     
     var logDriver = '/__spec__/workers/log.js?' + (new Date).valueOf()
     

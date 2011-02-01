@@ -1,5 +1,6 @@
 src_files:
   - evolu-steam.js
+  - data/bytes.js
 
 spec_files:
   - **/*[sS]pec.js
