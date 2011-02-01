@@ -181,6 +181,8 @@ describe('evolu.steam.Runner', function() {
         
         var result = run.option('a', { a: 1 })
         run.option('fitness', function (a) { return a + 1; })
+        run.option('mutate',
+            (new evolu.steam.Function('function(a) { return a + 2; }')))
         
         expect(result).toEqual(run)
         
@@ -205,6 +207,11 @@ describe('evolu.steam.Runner', function() {
                     command: 'option',
                     name:    'fitness',
                     func:    'function (a) { return a + 1; }'
+                },
+                {
+                    command: 'option',
+                    name:    'mutate',
+                    func:    'function(a) { return a + 2; }'
                 }
             ])
         })
